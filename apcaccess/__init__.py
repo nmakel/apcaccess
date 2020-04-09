@@ -1,9 +1,7 @@
-#!/usr/bin/env python3
-
 import socket
 
 
-class APCAccess():
+class apcaccess:
 
     SOCK_CMD = "\x00\x06status".encode()
     SOCK_EOF = "  \n\x00\x00"
@@ -27,7 +25,6 @@ class APCAccess():
         self.port = port
         self.timeout = timeout
 
-
     def get(self):
         try:
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -40,8 +37,6 @@ class APCAccess():
             while not buffer.endswith(self.SOCK_EOF):
                 buffer += s.recv(self.SOCK_BUF).decode()
 
-            s.close()
-
             return buffer
         except ConnectionRefusedError:
             print(f"Connection refused by {self.host}:{self.port}")
@@ -52,7 +47,6 @@ class APCAccess():
 
         return False
 
-
     def parse(self, raw, no_units):
         parsed = {}
         lines = [x[1:-1] for x in raw[:-len(self.SOCK_EOF)].split("\x00") if x]
@@ -62,25 +56,24 @@ class APCAccess():
 
         for line in lines:
             values = line.split(":", 1)
-            parsed[values[0].strip().lower()] = values[1].strip()
+            parsed[values[0].strip()] = values[1].strip()
 
         return parsed
-
 
     def strip_units(self, lines):
         for line in lines:
             for unit in self.units:
                 if line.endswith(f" {unit}"):
-                    line = line[:-1-len(unit)]
-            yield line
+                    line = line[:(-1-len(unit))]
 
+            yield line
 
     def status(self, no_units=False):
         raw = self.get()
         output = {}
 
         if raw:
-            for k,v in self.parse(raw, no_units).items():
+            for k, v in self.parse(raw, no_units).items():
                 output[k] = v
-
+        
         return output
