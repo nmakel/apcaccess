@@ -14,8 +14,8 @@ if __name__ == "__main__":
 
     try:
         ups = apcaccess.apcaccess(
-            host=args.host, 
-            port=args.port, 
+            host=args.host,
+            port=args.port,
             timeout=args.timeout
         )
 

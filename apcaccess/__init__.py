@@ -64,7 +64,7 @@ class apcaccess:
         for line in lines:
             for unit in self.units:
                 if line.endswith(f" {unit}"):
-                    line = line[:(-1-len(unit))]
+                    line = line[:(-1 - len(unit))]
 
             yield line
 
@@ -75,5 +75,5 @@ class apcaccess:
         if raw:
             for k, v in self.parse(raw, no_units).items():
                 output[k] = v
-        
+
         return output
