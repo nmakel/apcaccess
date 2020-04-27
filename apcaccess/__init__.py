@@ -1,7 +1,7 @@
 import socket
 
 
-class apcaccess:
+class APCAccess:
 
     SOCK_CMD = "\x00\x06status".encode()
     SOCK_EOF = "  \n\x00\x00"
