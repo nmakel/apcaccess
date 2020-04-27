@@ -2,6 +2,7 @@
 
 import apcaccess
 import argparse
+import json
 
 
 if __name__ == "__main__":
@@ -10,6 +11,7 @@ if __name__ == "__main__":
     argparser.add_argument("--port", type=int, default=3551, help="apcupsd port")
     argparser.add_argument("--timeout", type=int, default=5, help="Socket timeout")
     argparser.add_argument("--no_units", default=False, action="store_true", help="Strip units from values")
+    argparser.add_argument("--json", action="store_true", default=False, help="Output as JSON")
     args = argparser.parse_args()
 
     try:
@@ -19,7 +21,10 @@ if __name__ == "__main__":
             timeout=args.timeout
         )
 
-        for k, v in ups.status(no_units=args.no_units).items():
-            print(f"{k}: {v}")
+        if args.json:
+            print(json.dumps(ups.status(no_units=args.no_units), indent=4))
+        else:
+            for k, v in ups.status(no_units=args.no_units).items():
+                print(f"{k}: {v}")
     except Exception as e:
         print(f"Error: {e}")
