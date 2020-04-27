@@ -8,12 +8,13 @@ See `apcaccess.py` for a basic implementation:
 
 ```
 usage: apcaccess.py [-h] [--host HOST] [--port PORT] [--timeout TIMEOUT]
-                    [--no_units]
+                    [--no_units] [--json]
 
 optional arguments:
   -h, --help         show this help message and exit
-  --host HOST        APCUPSD hostname or ip address
-  --port PORT        APCUPSD port
+  --host HOST        apcupsd hostname or ip address
+  --port PORT        apcupsd port
   --timeout TIMEOUT  Socket timeout
   --no_units         Strip units from values
+  --json             Output as JSON
 ```
