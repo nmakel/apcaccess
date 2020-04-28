@@ -1,6 +1,6 @@
 # apcaccess
 
-apcaccess is a python library that replicates the functionality provided by the ```apcaccess``` tool. A TCP connection is made to the ```apcupsd``` daemon and the results of a ```status``` command are parsed and returned as a python ```dict```.
+apcaccess is a python library and tool that replicates `apcaccess` functionality.
 
 ## Usage
 
