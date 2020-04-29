@@ -3,6 +3,7 @@
 import apcaccess
 import argparse
 import json
+import socket
 
 
 if __name__ == "__main__":
@@ -15,16 +16,20 @@ if __name__ == "__main__":
     args = argparser.parse_args()
 
     try:
-        ups = apcaccess.apcaccess(
+        apc = apcaccess.APCAccess(
             host=args.host,
             port=args.port,
             timeout=args.timeout
         )
 
         if args.json:
-            print(json.dumps(ups.status(no_units=args.no_units), indent=4))
+            print(json.dumps(apc.status(no_units=args.no_units), indent=4))
         else:
-            for k, v in ups.status(no_units=args.no_units).items():
+            for k, v in apc.status(no_units=args.no_units).items():
                 print(f"{k}: {v}")
-    except Exception as e:
-        print(f"Error: {e}")
+    except ConnectionRefusedError:
+        print(f"Connection refused: {args.host}:{args.port}")
+    except (socket.herror, socket.gaierror):
+        print(f"Connection failed: {args.host}:{args.port}")
+    except socket.timeout:
+        print(f"Connection timed out: {args.host}:{args.port}")

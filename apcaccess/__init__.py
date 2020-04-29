@@ -1,10 +1,11 @@
 import socket
+import time
 
 
 class APCAccess:
 
     SOCK_CMD = "\x00\x06status".encode()
-    SOCK_EOF = "  \n\x00\x00"
+    SOCK_EOF = "\n\x00\x00"
     SOCK_BUF = 1024
 
     units = (
@@ -25,34 +26,30 @@ class APCAccess:
         self.port = port
         self.timeout = timeout
 
-    def get(self):
-        try:
-            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            s.settimeout(self.timeout)
-            s.connect((self.host, self.port))
-            s.send(self.SOCK_CMD)
+    def _get_status(self):
+        buffer = ""
 
-            buffer = ""
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+            sock.settimeout(self.timeout)
+            sock.connect((self.host, self.port))
+            sock.send(self.SOCK_CMD)
+
+            t_start = time.monotonic()
 
             while not buffer.endswith(self.SOCK_EOF):
-                buffer += s.recv(self.SOCK_BUF).decode()
+                buffer += sock.recv(self.SOCK_BUF).decode()
 
-            return buffer
-        except ConnectionRefusedError:
-            print(f"Connection refused by {self.host}:{self.port}")
-        except (socket.timeout, socket.gaierror):
-            print(f"Unable to connect to {self.host}:{self.port}")
-        finally:
-            s.close()
+                if (time.monotonic() - t_start) > self.timeout:
+                    raise socket.timeout
 
-        return False
+        return buffer
 
-    def parse(self, raw, no_units):
+    def _parse(self, raw, no_units):
         parsed = {}
         lines = [x[1:-1] for x in raw[:-len(self.SOCK_EOF)].split("\x00") if x]
 
         if no_units:
-            lines = self.strip_units(lines)
+            lines = self._strip_units(lines)
 
         for line in lines:
             values = line.split(":", 1)
@@ -60,7 +57,7 @@ class APCAccess:
 
         return parsed
 
-    def strip_units(self, lines):
+    def _strip_units(self, lines):
         for line in lines:
             for unit in self.units:
                 if line.endswith(f" {unit}"):
@@ -69,11 +66,4 @@ class APCAccess:
             yield line
 
     def status(self, no_units=False):
-        raw = self.get()
-        output = {}
-
-        if raw:
-            for k, v in self.parse(raw, no_units).items():
-                output[k] = v
-
-        return output
+        return self._parse(self._get_status(), no_units)
