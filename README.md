@@ -12,7 +12,7 @@ usage: apcaccess.py [-h] [--host HOST] [--port PORT] [--timeout TIMEOUT]
 
 optional arguments:
   -h, --help         show this help message and exit
-  --host HOST        apcupsd hostname or ip address
+  --host HOST        apcupsd host name or ip address
   --port PORT        apcupsd port
   --timeout TIMEOUT  Socket timeout
   --no_units         Strip units from values
